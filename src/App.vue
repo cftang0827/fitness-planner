@@ -179,18 +179,26 @@ function saveToStorage() {
   }
 }
 
-// ⑨ 從 localStorage 載入
+// ⑨ 從 localStorage 載入（這裡順便決定要不要直接進訓練模式）
 function loadFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return
+
     const parsed = JSON.parse(raw)
+
     if (parsed && Array.isArray(parsed.items)) {
       parsed.items = parsed.items.map(item => ({
         ...item,
         done: !!item.done
       }))
       plan.value = parsed
+
+      // ⭐ 只要有任何 items，就直接進「訓練模式」：隱藏上方 textarea
+      if (parsed.items.length > 0) {
+        editorVisible.value = false
+      }
+
       setStatus('已從 localStorage 載入上次的健身計畫。', 'info')
     }
   } catch (err) {
@@ -362,7 +370,6 @@ watch(
 .app-root {
   min-height: 100vh;
   background: #0f172a;
-  /* 深色一點，讓中間卡片像 app */
   padding: 12px 8px;
   display: flex;
   justify-content: center;
@@ -415,7 +422,8 @@ watch(
   border-radius: 10px;
   border: 1px solid #1f2937;
   resize: vertical;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
   font-size: 13px;
   background: #020617;
   color: #e5e7eb;
