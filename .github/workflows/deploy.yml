@@ -27,11 +27,16 @@ jobs:
           node-version: 22
           cache: 'npm'
 
-      - name: Install deps
+      - name: Install dependencies
         run: npm install
 
       - name: Build
         run: npm run build
+
+      # ⭐ 這步很重要，沒有它就會出你剛剛那個 404
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -39,8 +44,8 @@ jobs:
           path: ./dist
 
   deploy:
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
